@@ -23,37 +23,29 @@ export function HowItWorksSection() {
     <section id="how-it-works" className="relative py-32 px-6 md:px-12 border-t border-border">
       <div className="max-w-7xl mx-auto">
         <div className="mb-16 text-center">
-          <div className="inline-block border border-accent px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-accent mb-4">
-            SIMPLE 3-STEP PROCESS
-          </div>
-          <h2 className="font-[var(--font-bebas)] text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight">
-            FROM ZERO TO<br/>
-            GROWTH IN UNDER 5 MINUTES
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            How it works
           </h2>
-          <p className="mt-4 font-mono text-sm text-muted-foreground max-w-2xl mx-auto">
-            No technical skills. No complicated setup. Just a clear growth plan.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            No technical skills. No complicated setup. Just a clear growth plan in under 5 minutes.
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
           {steps.map((step, index) => (
-            <div key={index} className="text-center relative">
-              {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-8 left-[60%] w-[80%] h-px bg-border"></div>
-              )}
-              
+            <div key={index} className="text-center">
               <div className="relative inline-flex items-center justify-center w-16 h-16 mb-6">
-                <div className="absolute inset-0 border border-accent rotate-45"></div>
-                <span className="font-[var(--font-bebas)] text-2xl text-accent relative z-10">
+                <div className="absolute inset-0 border border-accent rounded-xl"></div>
+                <span className="font-[var(--font-bebas)] text-2xl text-accent">
                   {step.number}
                 </span>
               </div>
-              
-              <h3 className="font-[var(--font-bebas)] text-xl tracking-wide mb-3">
+
+              <h3 className="text-lg font-semibold mb-2">
                 {step.title}
               </h3>
-              
-              <p className="font-mono text-sm text-muted-foreground leading-relaxed">
+
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {step.description}
               </p>
             </div>
@@ -63,7 +55,7 @@ export function HowItWorksSection() {
         <div className="mt-10 flex items-center justify-center">
           <a
             href="/dashboard#x-login"
-            className="inline-flex items-center gap-3 border border-accent bg-accent px-8 py-3 font-mono text-xs uppercase tracking-widest text-accent-foreground hover:bg-accent/90 transition-all duration-200"
+            className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-accent to-orange-500 px-8 py-3 text-sm font-semibold text-white hover:shadow-lg hover:shadow-accent/25 transition-all duration-200"
           >
             Connect X
           </a>
@@ -71,20 +63,20 @@ export function HowItWorksSection() {
 
         {/* Time-to-value callout */}
         <div className="mt-16 text-center">
-          <div className="inline-flex items-center gap-6 border border-accent px-8 py-4">
+          <div className="inline-flex items-center gap-6 border border-border/50 rounded-2xl bg-card/40 backdrop-blur-sm px-8 py-4">
             <div>
-              <div className="font-[var(--font-bebas)] text-4xl text-accent">5 MIN</div>
-              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Setup Time</div>
+              <div className="text-3xl font-semibold text-foreground">5 MIN</div>
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Setup Time</div>
             </div>
             <div className="h-12 w-px bg-border"></div>
             <div>
-              <div className="font-[var(--font-bebas)] text-4xl text-accent">24 HRS</div>
-              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">First Momentum</div>
+              <div className="text-3xl font-semibold text-foreground">24 HRS</div>
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">First Momentum</div>
             </div>
             <div className="h-12 w-px bg-border"></div>
             <div>
-              <div className="font-[var(--font-bebas)] text-4xl text-accent">90 DAYS</div>
-              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Compounding Growth</div>
+              <div className="text-3xl font-semibold text-foreground">90 DAYS</div>
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Compounding Growth</div>
             </div>
           </div>
         </div>

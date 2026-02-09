@@ -1,7 +1,5 @@
 "use client"
 
-import { ScrambleTextOnHover } from "@/components/scramble-text"
-
 export function Navigation() {
   const links = [
     { label: "Features", href: "#features" },
@@ -11,9 +9,9 @@ export function Navigation() {
   ]
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] border-b border-border bg-background/95 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
-        <a href="#hero" className="font-[var(--font-bebas)] text-2xl tracking-wide">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/70 backdrop-blur-xl">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
+        <a href="#hero" className="text-xl font-bold tracking-tight">
           LAUNCHALONE
         </a>
 
@@ -22,7 +20,7 @@ export function Navigation() {
             <a
               key={index}
               href={link.href}
-              className="font-mono text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors duration-200"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               {link.label}
             </a>
@@ -31,9 +29,9 @@ export function Navigation() {
 
         <a
           href="#pricing"
-          className="border border-accent bg-accent px-6 py-2 font-mono text-xs uppercase tracking-widest text-accent-foreground hover:bg-accent/90 transition-all duration-200"
+          className="rounded-xl bg-gradient-to-r from-accent to-orange-500 px-6 py-2 text-sm font-semibold text-white hover:shadow-lg hover:shadow-accent/25 transition-all duration-200"
         >
-          <ScrambleTextOnHover text="Start In 5 Minutes" as="span" duration={0.6} />
+          Start In 5 Minutes
         </a>
       </div>
     </nav>

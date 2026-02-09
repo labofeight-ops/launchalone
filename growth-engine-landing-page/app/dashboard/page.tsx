@@ -346,6 +346,10 @@ export default function DashboardPage() {
   }
 
   function handleSchedule() {
+    if (!xConnected) {
+      setStatusNote("Connect X to schedule posts.")
+      return
+    }
     const slot = scheduleSlots[scheduleIndex % scheduleSlots.length]
     setScheduleIndex((prev) => prev + 1)
     setScheduledPosts((prev) => [
@@ -360,6 +364,10 @@ export default function DashboardPage() {
   }
 
   function handlePostNow() {
+    if (!xConnected) {
+      setStatusNote("Connect X to post.")
+      return
+    }
     setActivity((prev) => [
       { title: "Post sent", time: "Just now", stats: "Watch the first 45 minutes" },
       ...prev,
@@ -389,6 +397,10 @@ export default function DashboardPage() {
   }
 
   function handlePostReply(id: number) {
+    if (!xConnected) {
+      setStatusNote("Connect X to post replies.")
+      return
+    }
     const current = replyOps.find((item) => item.id === id)
     setReplyOps((prev) => prev.filter((item) => item.id !== id))
     setActivity((prev) => [
@@ -441,7 +453,7 @@ export default function DashboardPage() {
           </div>
 
           {/* X Login */}
-          <div id="x-login" className="border border-border bg-card p-6">
+          <div id="x-login" className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
               <div>
                 <h2 className="font-[var(--font-bebas)] text-2xl">CONNECT X</h2>
@@ -486,7 +498,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="border border-border p-4 space-y-3 font-mono text-sm">
+              <div className="border border-border/50 rounded-xl bg-card/30 p-4 space-y-3 font-mono text-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Status</span>
                   <span className="text-accent">{xConnected ? "Connected" : "Not Connected"}</span>
@@ -508,7 +520,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Analytics Controls */}
-          <div className="border border-border bg-card p-6" id="before-after">
+          <div className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6" id="before-after">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
               <div>
                 <h2 className="font-[var(--font-bebas)] text-2xl">BEFORE VS AFTER</h2>
@@ -535,7 +547,7 @@ export default function DashboardPage() {
 
             <div className="grid md:grid-cols-2 gap-3">
               {data.beforeAfter.map((item, i) => (
-                <div key={i} className="border border-border p-3 flex items-center justify-between">
+                <div key={i} className="border border-border/50 rounded-xl bg-card/30 p-3 flex items-center justify-between">
                   <div>
                     <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
                       {item.metric}
@@ -554,11 +566,11 @@ export default function DashboardPage() {
 
           {/* Trends */}
           <div id="growth-drivers" className="grid lg:grid-cols-2 gap-6">
-            <div className="border border-border bg-card p-6">
+            <div className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6">
               <h2 className="font-[var(--font-bebas)] text-2xl mb-4">GROWTH DRIVERS</h2>
               <div className="space-y-3 font-mono text-sm">
                 {data.drivers.map((driver, i) => (
-                  <div key={i} className="flex items-center justify-between border border-border px-3 py-2">
+                  <div key={i} className="flex items-center justify-between border border-border/50 rounded-xl bg-card/30 px-3 py-2">
                     <span className="text-muted-foreground">{driver.label}</span>
                     <span className="text-accent font-[var(--font-bebas)] text-lg">{driver.value}</span>
                   </div>
@@ -566,11 +578,11 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="border border-border bg-card p-6">
+            <div className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6">
               <h2 className="font-[var(--font-bebas)] text-2xl mb-4">TREND SNAPSHOT</h2>
               <div className="space-y-3">
                 {data.trends.map((trend, i) => (
-                  <div key={i} className="border border-border p-3">
+                  <div key={i} className="border border-border/50 rounded-xl bg-card/30 p-3">
                     <div className="flex items-center justify-between mb-2">
                       <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
                         {trend.label}
@@ -591,11 +603,11 @@ export default function DashboardPage() {
 
           {/* Top Content */}
           <div id="top-replies" className="grid lg:grid-cols-2 gap-6">
-            <div className="border border-border bg-card p-6">
+            <div className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6">
               <h2 className="font-[var(--font-bebas)] text-2xl mb-4">TOP CONTENT</h2>
               <div className="space-y-3">
                 {data.topPosts.map((post, i) => (
-                  <div key={i} className="border border-border p-3">
+                  <div key={i} className="border border-border/50 rounded-xl bg-card/30 p-3">
                     <div className="font-mono text-sm text-foreground mb-1">{post.title}</div>
                     <div className="font-mono text-xs text-muted-foreground">{post.stats}</div>
                   </div>
@@ -603,11 +615,11 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="border border-border bg-card p-6">
+            <div className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6">
               <h2 className="font-[var(--font-bebas)] text-2xl mb-4">TOP REPLIES</h2>
               <div className="space-y-3">
                 {data.topReplies.map((reply, i) => (
-                  <div key={i} className="border border-border p-3">
+                  <div key={i} className="border border-border/50 rounded-xl bg-card/30 p-3">
                     <div className="font-mono text-sm text-foreground mb-1">{reply.title}</div>
                     <div className="font-mono text-xs text-muted-foreground">{reply.stats}</div>
                   </div>
@@ -618,7 +630,7 @@ export default function DashboardPage() {
 
           {/* Content Generator */}
           <div id="content-studio" className="grid lg:grid-cols-2 gap-6">
-            <div className="border border-border bg-card p-6">
+            <div className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-[var(--font-bebas)] text-2xl">CONTENT STUDIO</h2>
                 <span className="font-mono text-[10px] uppercase tracking-widest text-accent">
@@ -709,7 +721,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="border border-border bg-card p-6">
+            <div className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-[var(--font-bebas)] text-2xl">DRAFT PREVIEW</h2>
                 <div className="flex items-center gap-2">
@@ -722,7 +734,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="bg-background border border-border p-4 mb-4 min-h-[200px] font-mono text-sm whitespace-pre-line">
+              <div className="bg-background border border-border/50 rounded-xl bg-card/30 p-4 mb-4 min-h-[200px] font-mono text-sm whitespace-pre-line">
                 {draftPreview}
               </div>
 
@@ -741,13 +753,15 @@ export default function DashboardPage() {
                 </button>
                 <button
                   onClick={handleSchedule}
-                  className="flex-1 border border-border text-foreground px-4 py-2 font-mono text-xs uppercase tracking-widest hover:border-accent hover:text-accent transition-colors"
+                  disabled={!xConnected}
+                  className="flex-1 border border-border text-foreground px-4 py-2 font-mono text-xs uppercase tracking-widest hover:border-accent hover:text-accent transition-colors disabled:opacity-60 disabled:pointer-events-none"
                 >
                   Schedule
                 </button>
                 <button
                   onClick={handlePostNow}
-                  className="flex-1 bg-accent text-accent-foreground px-4 py-2 font-mono text-xs uppercase tracking-widest hover:bg-accent/90 transition-colors"
+                  disabled={!xConnected}
+                  className="flex-1 bg-accent text-accent-foreground px-4 py-2 font-mono text-xs uppercase tracking-widest hover:bg-accent/90 transition-colors disabled:opacity-60 disabled:pointer-events-none"
                 >
                   Post Now
                 </button>
@@ -756,7 +770,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Reply Opportunities */}
-          <div id="reply-opportunities" className="border border-border bg-card p-6">
+          <div id="reply-opportunities" className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="font-[var(--font-bebas)] text-2xl mb-1">REPLY OPPORTUNITIES</h2>
@@ -775,7 +789,7 @@ export default function DashboardPage() {
 
             <div className="space-y-4">
               {replyOps.map((item) => (
-                <div key={item.id} className="border border-border p-4 hover:border-accent transition-colors">
+                <div key={item.id} className="border border-border/50 rounded-xl bg-card/30 p-4 hover:border-accent transition-colors">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <div className="font-mono text-xs text-muted-foreground">{item.handle}</div>
@@ -798,7 +812,8 @@ export default function DashboardPage() {
                   <div className="flex gap-3">
                     <button
                       onClick={() => handlePostReply(item.id)}
-                      className="flex-1 bg-accent text-accent-foreground px-4 py-2 font-mono text-xs uppercase tracking-widest hover:bg-accent/90 transition-colors"
+                      disabled={!xConnected}
+                      className="flex-1 bg-accent text-accent-foreground px-4 py-2 font-mono text-xs uppercase tracking-widest hover:bg-accent/90 transition-colors disabled:opacity-60 disabled:pointer-events-none"
                     >
                       Post Reply
                     </button>
@@ -822,12 +837,12 @@ export default function DashboardPage() {
 
           {/* Scheduled Posts */}
           <div className="grid lg:grid-cols-2 gap-6">
-            <div id="scheduled-posts" className="border border-border bg-card p-6">
+            <div id="scheduled-posts" className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6">
               <h2 className="font-[var(--font-bebas)] text-2xl mb-4">SCHEDULED POSTS</h2>
 
               <div className="space-y-3">
                 {scheduledPosts.map((post, i) => (
-                  <div key={`${post.time}-${i}`} className="border border-border p-3 hover:border-accent transition-colors">
+                  <div key={`${post.time}-${i}`} className="border border-border/50 rounded-xl bg-card/30 p-3 hover:border-accent transition-colors">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-mono text-[10px] uppercase tracking-widest text-accent">
                         ⬡ {post.time}
@@ -842,12 +857,12 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div id="timing-plan" className="border border-border bg-card p-6">
+            <div id="timing-plan" className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6">
               <h2 className="font-[var(--font-bebas)] text-2xl mb-4">TIMING PLAN</h2>
 
               <div className="space-y-3">
                 {timingPlan.map((slot, i) => (
-                  <div key={i} className="flex items-center justify-between border border-border p-3">
+                  <div key={i} className="flex items-center justify-between border border-border/50 rounded-xl bg-card/30 p-3">
                     <div>
                       <div className="font-[var(--font-bebas)] text-lg">{slot.time}</div>
                       <div className="font-mono text-xs text-muted-foreground">{slot.reason}</div>
@@ -866,7 +881,7 @@ export default function DashboardPage() {
 
           {/* Account Health + Lead Flow */}
           <div className="grid lg:grid-cols-2 gap-6">
-            <div id="account-health" className="border border-border bg-card p-6">
+            <div id="account-health" className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6">
               <h2 className="font-[var(--font-bebas)] text-2xl mb-4">ACCOUNT HEALTH</h2>
               <div className="space-y-3 font-mono text-sm">
                 {[
@@ -875,7 +890,7 @@ export default function DashboardPage() {
                   { label: "Shadow Check", value: "Clear" },
                   { label: "Automation Pace", value: "Balanced" },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center justify-between border border-border px-3 py-2">
+                  <div key={i} className="flex items-center justify-between border border-border/50 rounded-xl bg-card/30 px-3 py-2">
                     <span className="text-muted-foreground">{item.label}</span>
                     <span className="text-accent font-[var(--font-bebas)] text-lg">{item.value}</span>
                   </div>
@@ -883,7 +898,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div id="lead-flow" className="border border-border bg-card p-6">
+            <div id="lead-flow" className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6">
               <h2 className="font-[var(--font-bebas)] text-2xl mb-4">LEAD FLOW</h2>
               <div className="space-y-3 font-mono text-sm">
                 {[
@@ -892,7 +907,7 @@ export default function DashboardPage() {
                   { label: "Offer CTA", value: "Rotating" },
                   { label: "Lead Tagging", value: "On" },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center justify-between border border-border px-3 py-2">
+                  <div key={i} className="flex items-center justify-between border border-border/50 rounded-xl bg-card/30 px-3 py-2">
                     <span className="text-muted-foreground">{item.label}</span>
                     <span className="text-accent font-[var(--font-bebas)] text-lg">{item.value}</span>
                   </div>
@@ -902,11 +917,11 @@ export default function DashboardPage() {
           </div>
 
           {/* Activity */}
-          <div id="activity" className="border border-border bg-card p-6">
+          <div id="activity" className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6">
             <h2 className="font-[var(--font-bebas)] text-2xl mb-4">RECENT ACTIVITY</h2>
             <div className="space-y-3">
               {activity.map((item, i) => (
-                <div key={i} className="border border-border p-3 flex items-center justify-between">
+                <div key={i} className="border border-border/50 rounded-xl bg-card/30 p-3 flex items-center justify-between">
                   <div>
                     <div className="font-mono text-sm text-foreground">{item.title}</div>
                     <div className="font-mono text-xs text-muted-foreground">{item.time}</div>

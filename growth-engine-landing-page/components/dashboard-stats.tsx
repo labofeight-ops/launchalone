@@ -38,15 +38,15 @@ export function DashboardStats({ stats = defaultStats }: { stats?: DashboardStat
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="border border-border p-6 hover:border-accent/50 transition-colors"
+          className="border border-border/50 rounded-2xl bg-card/50 backdrop-blur-sm p-6 hover:border-accent/50 hover:shadow-lg hover:shadow-accent/5 transition-all"
         >
-          <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
             {stat.label}
           </div>
-          <div className="font-[var(--font-bebas)] text-4xl tracking-wide mb-1">
+          <div className="text-3xl font-semibold text-foreground mb-1">
             {stat.value}
           </div>
-          <div className="font-mono text-xs text-muted-foreground">
+          <div className="text-xs text-muted-foreground">
             {stat.change}
           </div>
         </div>

@@ -11,13 +11,16 @@ export function StatsSection() {
   return (
     <section className="relative py-24 px-6 md:px-12 border-t border-border">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
-            <div key={index} className="text-center">
-              <div className="font-[var(--font-bebas)] text-[clamp(2.5rem,5vw,4rem)] leading-none text-accent">
+            <div
+              key={index}
+              className="text-center rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm p-6"
+            >
+              <div className="text-3xl md:text-4xl font-semibold text-foreground">
                 {stat.value}
               </div>
-              <div className="mt-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              <div className="mt-2 text-xs uppercase tracking-widest text-muted-foreground">
                 {stat.label}
               </div>
             </div>

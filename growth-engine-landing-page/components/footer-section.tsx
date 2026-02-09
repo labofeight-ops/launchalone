@@ -31,14 +31,14 @@ export function FooterSection() {
   ]
 
   return (
-    <footer className="relative border-t border-border px-6 md:px-12 py-16">
+    <footer className="relative border-t border-border/50 px-6 md:px-12 py-16">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           <div>
-            <h3 className="font-[var(--font-bebas)] text-2xl tracking-wide mb-4">
+            <h3 className="text-xl font-bold mb-4">
               LAUNCHALONE
             </h3>
-            <p className="font-mono text-xs text-muted-foreground leading-relaxed">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               The ultra specialist for X growth built for personal and business brands.
             </p>
           </div>
@@ -53,7 +53,7 @@ export function FooterSection() {
                   <li key={i}>
                     <a
                       href={link.href}
-                      className="font-mono text-xs text-muted-foreground hover:text-accent transition-colors duration-200"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {link.label}
                     </a>
@@ -64,8 +64,8 @@ export function FooterSection() {
           ))}
         </div>
 
-        <div className="pt-8 border-t border-border">
-          <p className="font-mono text-xs text-muted-foreground text-center">
+        <div className="pt-8 border-t border-border/50">
+          <p className="text-xs text-muted-foreground text-center">
             © 2026 LAUNCHALONE. All rights reserved.
           </p>
         </div>

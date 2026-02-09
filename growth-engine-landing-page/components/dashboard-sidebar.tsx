@@ -36,9 +36,9 @@ export function DashboardSidebar() {
   const [activeItem, setActiveItem] = useState("Dashboard")
 
   return (
-    <aside className="fixed left-0 top-0 hidden h-screen w-60 border-r border-border bg-background z-50 md:flex md:flex-col">
-      <div className="p-6 border-b border-border">
-        <Link href="/" className="font-[var(--font-bebas)] text-2xl tracking-wide hover:text-accent transition-colors">
+    <aside className="fixed left-0 top-0 hidden h-screen w-60 border-r border-border/50 bg-background/70 backdrop-blur-xl z-50 md:flex md:flex-col">
+      <div className="p-6 border-b border-border/50">
+        <Link href="/" className="text-lg font-bold tracking-tight hover:text-foreground transition-colors">
           LAUNCHALONE
         </Link>
         <div className="mt-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -78,9 +78,9 @@ export function DashboardSidebar() {
       </nav>
 
       {/* Growth Status */}
-      <div className="border-t border-border p-4 bg-card">
+      <div className="border-t border-border/50 p-4 bg-card/40">
         <div className="text-center">
-          <div className="font-[var(--font-bebas)] text-3xl text-accent">3,247</div>
+          <div className="text-2xl font-semibold text-foreground">3,247</div>
           <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
             Total Followers
           </div>
