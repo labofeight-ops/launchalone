@@ -1,38 +1,39 @@
-const path = require('path')
+const express = require('express');
+const next = require('next');
+const path = require('path');
 
-const express = require(path.join(__dirname, 'xgrowth', 'node_modules', 'express'))
-const next = require(path.join(
-  __dirname,
-  'growth-engine-saa-s-landing-page',
-  'node_modules',
-  'next'
-))
+const dev = process.env.NODE_ENV !== 'production';
+const port = process.env.PORT || 3000;
 
-const { app: apiApp } = require('./xgrowth/server')
+// Initialize Next.js
+const nextApp = next({ dev });
+const handle = nextApp.getRequestHandler();
 
-const dev = process.env.NODE_ENV !== 'production'
-const port = Number(process.env.PORT || 3000)
+// Import backend app
+const backendApp = require('./backend-server-ultra');
 
-const nextApp = next({
-  dev,
-  dir: path.join(__dirname, 'growth-engine-saa-s-landing-page'),
-})
+nextApp.prepare().then(() => {
+  const server = express();
 
-const handle = nextApp.getRequestHandler()
+  // Redirect root to landing page might depend on how backend/frontend are structured.
+  // backendApp usually handles /api routes.
 
-nextApp
-  .prepare()
-  .then(() => {
-    const server = express()
+  // Use backendApp as middleware
+  server.use(backendApp);
 
-    server.use(apiApp)
-    server.all('*', (req, res) => handle(req, res))
+  // Next.js request handler
+  server.all('*', (req, res) => {
+    return handle(req, res);
+  });
 
-    server.listen(port, () => {
-      console.log(`🚀 App running on http://localhost:${port}`)
-    })
-  })
-  .catch((error) => {
-    console.error('Failed to start server:', error)
-    process.exit(1)
-  })
+  server.listen(port, (err) => {
+    if (err) throw err;
+    console.log(`\n🚀 LAUNCHALONE INTEGRATED ENGINE ACTIVE`);
+    console.log(`✅ Server running on http://localhost:${port}`);
+    console.log(`✅ Next.js Landing Page: READY`);
+    console.log(`✅ Ultra Growth API: ACTIVE\n`);
+  });
+}).catch((err) => {
+  console.error('Error starting server:', err);
+  process.exit(1);
+});

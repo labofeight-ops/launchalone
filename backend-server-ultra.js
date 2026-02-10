@@ -880,17 +880,22 @@ app.get('/api/account/health', async (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 const HOST = process.env.HOST || '127.0.0.1';
-app.listen(PORT, HOST, () => {
-  console.log('\n🔥 LAUNCHALONE ULTRA GROWTH ENGINE 🔥\n');
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`✅ Host: ${HOST}`);
-  console.log(`✅ XAI Grok integration: ${process.env.XAI_API_KEY ? 'ACTIVE' : 'MISSING KEY'}`);
-  console.log(`✅ Supabase connection: ${process.env.SUPABASE_URL ? 'ACTIVE' : 'MISSING URL'}`);
-  console.log('\n🚀 Secret Sauce Loaded:');
-  console.log('   → Neural Humanization Engine');
-  console.log('   → 2026 Algorithm Decoder');
-  console.log('   → Reply Sniper System');
-  console.log('   → First 45 Minute Stack');
-  console.log('   → Voiceprint Analyzer');
-  console.log('\n💰 Combined Value: $500K+ in proprietary systems\n');
-});
+if (require.main === module) {
+  app.listen(PORT, HOST, () => {
+    console.log('\n🔥 LAUNCHALONE ULTRA GROWTH ENGINE 🔥\n');
+    console.log(`✅ Server running on port ${PORT}`);
+    console.log(`✅ Host: ${HOST}`);
+    console.log(`✅ XAI Grok integration: ${process.env.XAI_API_KEY ? 'ACTIVE' : 'MISSING KEY'}`);
+    console.log(`✅ Supabase connection: ${process.env.SUPABASE_URL ? 'ACTIVE' : 'MISSING URL'}`);
+    console.log('\n🚀 Secret Sauce Loaded:');
+    console.log('   → Neural Humanization Engine');
+    console.log('   → 2026 Algorithm Decoder');
+    console.log('   → Reply Sniper System');
+    console.log('   → First 45 Minute Stack');
+    console.log('   → Voiceprint Analyzer');
+    console.log('\n💰 Combined Value: $500K+ in proprietary systems\n');
+  });
+}
+
+module.exports = app;
+
