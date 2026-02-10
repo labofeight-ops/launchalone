@@ -20,22 +20,23 @@ export function HowItWorksSection() {
   ]
 
   return (
-    <section id="how-it-works" className="relative py-32 px-6 md:px-12 border-t border-border">
+    <section id="how-it-works" className="relative py-24 px-4 md:px-10 border-t border-border bg-background">
       <div className="max-w-7xl mx-auto">
         <div className="mb-16 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            How it works
+          <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground mb-3">Workflow</div>
+          <h2 className="text-[clamp(2.1rem,4vw,3.2rem)] font-black mb-3">
+            Ship like the X team built it.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            No technical skills. No complicated setup. Just a clear growth plan in under 5 minutes.
+            Connect, lock your voice, queue slots, publish with the real X API. Nothing automatic, everything compliant.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
           {steps.map((step, index) => (
             <div key={index} className="text-center">
               <div className="relative inline-flex items-center justify-center w-16 h-16 mb-6">
-                <div className="absolute inset-0 border border-accent rounded-xl"></div>
+                <div className="absolute inset-0 border border-border rounded-full"></div>
                 <span className="font-[var(--font-bebas)] text-2xl text-accent">
                   {step.number}
                 </span>
@@ -55,7 +56,7 @@ export function HowItWorksSection() {
         <div className="mt-10 flex items-center justify-center">
           <a
             href="/dashboard#x-login"
-            className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-accent to-orange-500 px-8 py-3 text-sm font-semibold text-white hover:shadow-lg hover:shadow-accent/25 transition-all duration-200"
+            className="inline-flex items-center gap-2 rounded-full border border-border px-8 py-3 text-sm font-semibold text-foreground hover:border-accent transition"
           >
             Connect X
           </a>

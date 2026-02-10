@@ -59,14 +59,15 @@ export function PricingSection() {
   ]
 
   return (
-    <section id="pricing" className="relative py-32 px-6 md:px-12 border-t border-border">
+    <section id="pricing" className="relative py-28 px-4 md:px-10 border-t border-border bg-background">
       <div className="max-w-7xl mx-auto">
         <div className="mb-16 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Simple, transparent pricing
+          <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground mb-3">Pricing</div>
+          <h2 className="text-[clamp(2.1rem,4vw,3.4rem)] font-black mb-3">
+            Simple, X-style plans.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Start free. Upgrade when you are ready to scale. Cancel anytime.
+            Start free. Grow on your terms. Cancel anytime.
           </p>
         </div>
 
@@ -75,8 +76,8 @@ export function PricingSection() {
             <div
               key={index}
               className={`relative border ${
-                plan.popular ? "border-accent/50 shadow-xl shadow-accent/10" : "border-border/50"
-              } rounded-3xl bg-card/50 backdrop-blur-sm p-8 hover:border-accent/50 hover:shadow-lg hover:shadow-accent/5 transition-all duration-300`}
+                plan.popular ? "border-accent/60 shadow-[0_20px_60px_rgba(29,155,240,0.18)]" : "border-border"
+              } rounded-3xl bg-card/80 p-8 hover:border-accent/60 transition-all duration-200`}
             >
               <AnimatedNoise opacity={0.02} />
               
@@ -115,42 +116,13 @@ export function PricingSection() {
 
                 <a
                   href="/dashboard#x-login"
-                  className="block w-full text-center rounded-2xl bg-gradient-to-r from-accent to-orange-500 px-6 py-3 text-sm font-semibold text-white hover:shadow-lg hover:shadow-accent/25 hover:scale-[1.02] transition-all duration-300"
+                  className="block w-full text-center rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white hover:brightness-110 transition"
                 >
                   {plan.cta}
                 </a>
               </div>
             </div>
           ))}
-        </div>
-
-        {/* ROI Calculator */}
-        <div className="mt-16 border border-border/50 rounded-3xl bg-card/50 backdrop-blur-sm p-8 max-w-4xl mx-auto">
-          <AnimatedNoise opacity={0.02} />
-          <div className="relative z-10">
-            <h3 className="text-2xl font-semibold mb-4 text-center">
-              SIMPLE MATH: YOUR ROI
-            </h3>
-            <div className="grid md:grid-cols-3 gap-6 text-sm">
-              <div className="text-center">
-                <div className="text-3xl font-semibold text-foreground mb-2">10K</div>
-                <div className="text-muted-foreground">Followers in 90 days</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-semibold text-foreground mb-2">2%</div>
-                <div className="text-muted-foreground">Convert to customers</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-semibold text-foreground mb-2">200</div>
-                <div className="text-muted-foreground">New customers</div>
-              </div>
-            </div>
-            <div className="mt-6 text-center">
-              <p className="text-xs text-muted-foreground">
-                Even at $50/customer = <span className="text-accent">$10,000 revenue</span> from a $49/mo investment
-              </p>
-            </div>
-          </div>
         </div>
 
       </div>

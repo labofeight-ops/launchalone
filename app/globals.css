@@ -3,55 +3,46 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Skillkit Dark Theme - Exact Match */
 :root {
-  /* Pure black background like Skillkit */
-  --background: oklch(0.08 0 0);
-  --foreground: oklch(0.96 0 0);
+  /* X.com-inspired palette */
+  --background: #000000;
+  --foreground: #e7e9ea;
   
-  /* Slightly lighter black for cards */
-  --card: oklch(0.11 0 0);
-  --card-foreground: oklch(0.96 0 0);
+  --card: #0f1419;
+  --card-foreground: #e7e9ea;
   
-  --popover: oklch(0.09 0 0);
-  --popover-foreground: oklch(0.96 0 0);
+  --popover: #0a0d10;
+  --popover-foreground: #e7e9ea;
   
-  /* Bright white primary */
-  --primary: oklch(0.96 0 0);
-  --primary-foreground: oklch(0.08 0 0);
+  --primary: #e7e9ea;
+  --primary-foreground: #0b0c0e;
   
-  /* Dark gray secondary */
-  --secondary: oklch(0.16 0 0);
-  --secondary-foreground: oklch(0.88 0 0);
+  --secondary: #161b22;
+  --secondary-foreground: #cfd3d5;
   
-  /* Muted grays */
-  --muted: oklch(0.18 0 0);
-  --muted-foreground: oklch(0.52 0 0);
+  --muted: #1f242a;
+  --muted-foreground: #8b98a5;
   
-  /* Electric blue accent - Skillkit style */
-  --accent: oklch(0.62 0.24 225);
-  --accent-foreground: oklch(0.96 0 0);
+  --accent: #1d9bf0; /* Twitter blue */
+  --accent-foreground: #ffffff;
   
-  --destructive: oklch(0.58 0.24 28);
-  --destructive-foreground: oklch(0.96 0 0);
+  --destructive: #f4212e;
+  --destructive-foreground: #ffffff;
   
-  /* Dark borders */
-  --border: oklch(0.18 0 0);
-  --input: oklch(0.16 0 0);
-  --ring: oklch(0.62 0.24 225);
+  --border: #2f3336;
+  --input: #2f3336;
+  --ring: #1d9bf0;
   
-  /* Sharp modern corners */
-  --radius: 0.5rem;
+  --radius: 0.6rem;
   
-  /* Sidebar */
-  --sidebar: oklch(0.09 0 0);
-  --sidebar-foreground: oklch(0.96 0 0);
-  --sidebar-primary: oklch(0.62 0.24 225);
-  --sidebar-primary-foreground: oklch(0.96 0 0);
-  --sidebar-accent: oklch(0.14 0 0);
-  --sidebar-accent-foreground: oklch(0.96 0 0);
-  --sidebar-border: oklch(0.18 0 0);
-  --sidebar-ring: oklch(0.62 0.24 225);
+  --sidebar: #0f1419;
+  --sidebar-foreground: #e7e9ea;
+  --sidebar-primary: #1d9bf0;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #161b22;
+  --sidebar-accent-foreground: #e7e9ea;
+  --sidebar-border: #2f3336;
+  --sidebar-ring: #1d9bf0;
 }
 
 @theme inline {
@@ -98,62 +89,54 @@
     @apply border-border;
   }
   
-  html {
-    overflow-x: hidden;
-    max-width: 100vw;
-    scrollbar-width: thin;
-    scrollbar-color: oklch(0.28 0 0) oklch(0.08 0 0);
-  }
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  scrollbar-width: thin;
+  scrollbar-color: #2f3336 #000;
+  background: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
   
-  body {
-    @apply bg-background text-foreground;
-    overflow-x: hidden;
-    max-width: 100vw;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  
-  /* Dark scrollbar like Skillkit */
   html::-webkit-scrollbar,
   body::-webkit-scrollbar {
-    width: 12px;
+    width: 10px;
   }
   
   html::-webkit-scrollbar-track,
   body::-webkit-scrollbar-track {
-    background: oklch(0.08 0 0);
+    background: #000;
   }
   
   html::-webkit-scrollbar-thumb,
   body::-webkit-scrollbar-thumb {
-    background: oklch(0.28 0 0);
+    background: #2f3336;
     border-radius: 6px;
   }
   
   html::-webkit-scrollbar-thumb:hover,
   body::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.35 0 0);
+    background: #3a3f44;
   }
 }
 
-/* Glowing blue selection like Skillkit */
 ::selection {
-  background: oklch(0.62 0.24 225 / 0.25);
-  color: oklch(0.98 0 0);
+  background: rgba(29, 155, 240, 0.25);
+  color: #ffffff;
 }
 
-/* Blue glow on focus */
 :focus-visible {
-  outline: 2px solid oklch(0.62 0.24 225);
+  outline: 2px solid #1d9bf0;
   outline-offset: 2px;
 }
 
-/* Subtle dark grid */
 .grid-bg {
-  background-image: 
-    linear-gradient(to right, oklch(0.11 0 0) 1px, transparent 1px),
-    linear-gradient(to bottom, oklch(0.11 0 0) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, #0f1419 1px, transparent 1px),
+    linear-gradient(to bottom, #0f1419 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
 /* Noise texture overlay */

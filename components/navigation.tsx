@@ -2,20 +2,24 @@
 
 export function Navigation() {
   const links = [
+    { label: "Home", href: "#hero" },
     { label: "Features", href: "#features" },
-    { label: "How It Works", href: "#how-it-works" },
+    { label: "Inspiration", href: "#how-it-works" },
     { label: "Pricing", href: "#pricing" },
     { label: "Dashboard", href: "/dashboard" },
   ]
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
-        <a href="#hero" className="text-xl font-bold tracking-tight text-foreground">
-          LAUNCHALONE
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
+        <a href="#hero" className="flex items-center gap-2 text-xl font-semibold text-foreground">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-lg font-black">
+            X
+          </span>
+          <span className="hidden sm:inline">LaunchAlone</span>
         </a>
 
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-6">
           {links.map((link, index) => (
             <a
               key={index}
@@ -28,10 +32,10 @@ export function Navigation() {
         </div>
 
         <a
-          href="#pricing"
-          className="rounded-lg bg-gradient-to-r from-accent to-blue-400 px-6 py-2 text-sm font-semibold text-white hover:shadow-lg hover:shadow-accent/30 transition-all duration-200"
+          href="/dashboard#x-login"
+          className="rounded-full border border-border bg-accent text-accent-foreground px-5 py-2 text-sm font-semibold hover:brightness-110 transition-all duration-150"
         >
-          Get Started
+          Sign in with X
         </a>
       </div>
     </nav>

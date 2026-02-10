@@ -43,35 +43,28 @@ export function FeaturesSection() {
   ]
 
   return (
-    <section id="features" className="relative py-32 px-6 md:px-12 border-t border-border bg-background">
+    <section id="features" className="relative py-28 px-4 md:px-10 border-t border-border bg-background">
       <div className="max-w-7xl mx-auto">
         <div className="mb-16 text-center">
-          <div className="inline-block border border-accent/30 bg-accent/5 px-4 py-1.5 rounded-full mb-6">
-            <span className="font-mono text-xs uppercase tracking-widest text-accent">
-              $500K+ Proprietary Systems
-            </span>
-          </div>
-          <h2 className="text-[clamp(2.5rem,5vw,4rem)] font-bold leading-none tracking-tight">
-            Safe AI Growth for X<br/>
-            <span className="bg-gradient-to-r from-accent to-blue-400 bg-clip-text text-transparent">
-              Without the Bans
-            </span>
+          <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground mb-3">Made for X</div>
+          <h2 className="text-[clamp(2.2rem,4vw,3.4rem)] font-black leading-tight">
+            Everything feels like X.
           </h2>
-          <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
-            AI does the heavy lifting. You stay in control. Zero automation = zero suspension risk.
+          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+            From the slot queue to the mentions inbox, every surface mirrors the product language of X—fast, sparse, tactile.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="relative border border-border bg-card hover:border-accent/50 transition-all duration-300 p-8 rounded-xl group overflow-hidden"
+              className="relative border border-border bg-card/80 hover:border-accent/60 transition-all duration-200 p-7 rounded-2xl group overflow-hidden"
             >
               <AnimatedNoise opacity={0.01} />
               
               <div className="relative z-10">
-                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="text-4xl mb-5 group-hover:scale-110 transition-transform duration-300">
                   {feature.icon}
                 </div>
                 
@@ -86,7 +79,7 @@ export function FeaturesSection() {
                 <div className="flex items-center gap-3 pt-4 border-t border-border">
                   {feature.metrics.map((metric, i) => (
                     <div key={i} className="flex-1">
-                      <div className="text-xs uppercase tracking-widest text-accent/80 font-mono">
+                      <div className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground font-mono">
                         {metric}
                       </div>
                     </div>

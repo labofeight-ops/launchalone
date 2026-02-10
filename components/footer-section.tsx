@@ -31,12 +31,15 @@ export function FooterSection() {
   ]
 
   return (
-    <footer className="relative border-t border-border/50 px-6 md:px-12 py-16">
+    <footer className="relative border-t border-border px-4 md:px-10 py-14 bg-background">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           <div>
-            <h3 className="text-xl font-bold mb-4">
-              LAUNCHALONE
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-lg font-black">
+                X
+              </span>
+              LaunchAlone
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               The ultra specialist for X growth built for personal and business brands.
