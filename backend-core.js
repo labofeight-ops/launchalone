@@ -9,17 +9,17 @@ app.use(express.json());
 
 // Warn early if XAI key missing (content generation will fail)
 if (!process.env.XAI_API_KEY) {
-  console.warn('Warning: XAI_API_KEY is not set. Content generation endpoints will fail.');
+  console.warn('⚠️  Warning: XAI_API_KEY is not set. Content generation endpoints will fail.');
 }
 
 // Use service role key so the backend can bypass Supabase RLS policies.
 // Falls back to public anon key for local demos, but writes will fail if RLS is on.
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
   console.error(
-    'Missing Supabase configuration. Set SUPABASE_URL and SUPABASE_SERVICE_KEY (or SUPABASE_KEY).'
+    '❌ Missing Supabase configuration. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or NEXT_PUBLIC_SUPABASE_ANON_KEY).'
   );
   process.exit(1);
 }
@@ -886,13 +886,11 @@ if (require.main === module) {
     console.log(`✅ Server running on port ${PORT}`);
     console.log(`✅ Host: ${HOST}`);
     console.log(`✅ XAI Grok integration: ${process.env.XAI_API_KEY ? 'ACTIVE' : 'MISSING KEY'}`);
-    console.log(`✅ Supabase connection: ${process.env.SUPABASE_URL ? 'ACTIVE' : 'MISSING URL'}`);
+    console.log(`✅ Supabase connection: ${supabaseUrl ? 'ACTIVE' : 'MISSING URL'}`);
     console.log('\n🚀 Secret Sauce Loaded:');
     console.log('   → Neural Humanization Engine');
     console.log('   → 2026 Algorithm Decoder');
-    console.log('   → Reply Sniper System');
-    console.log('   → First 45 Minute Stack');
-    console.log('   → Voiceprint Analyzer');
+    console.log('   → XAI Grok Integration');
     console.log('\n💰 Combined Value: $500K+ in proprietary systems\n');
   });
 }
