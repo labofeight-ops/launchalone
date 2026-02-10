@@ -3,43 +3,60 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* AgentSkills-inspired design tokens - modern SaaS with orange gradient */
+/* Skillkit Dark Theme - Exact Match */
 :root {
-  --background: oklch(0.09 0.01 260);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.13 0.015 260);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.11 0.01 260);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.70 0.20 35);
-  --primary-foreground: oklch(0.09 0.01 260);
-  --secondary: oklch(0.18 0.02 260);
-  --secondary-foreground: oklch(0.95 0 0);
-  --muted: oklch(0.25 0.02 260);
-  --muted-foreground: oklch(0.58 0.01 260);
-  --accent: oklch(0.70 0.20 35);
-  --accent-foreground: oklch(0.09 0.01 260);
-  --destructive: oklch(0.60 0.25 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.20 0.02 260);
-  --input: oklch(0.18 0.015 260);
-  --ring: oklch(0.70 0.20 35);
-  --radius: 1rem;
-  --sidebar: oklch(0.11 0.01 260);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.70 0.20 35);
-  --sidebar-primary-foreground: oklch(0.09 0.01 260);
-  --sidebar-accent: oklch(0.18 0.015 260);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.20 0.02 260);
-  --sidebar-ring: oklch(0.70 0.20 35);
+  /* Pure black background like Skillkit */
+  --background: oklch(0.08 0 0);
+  --foreground: oklch(0.96 0 0);
+  
+  /* Slightly lighter black for cards */
+  --card: oklch(0.11 0 0);
+  --card-foreground: oklch(0.96 0 0);
+  
+  --popover: oklch(0.09 0 0);
+  --popover-foreground: oklch(0.96 0 0);
+  
+  /* Bright white primary */
+  --primary: oklch(0.96 0 0);
+  --primary-foreground: oklch(0.08 0 0);
+  
+  /* Dark gray secondary */
+  --secondary: oklch(0.16 0 0);
+  --secondary-foreground: oklch(0.88 0 0);
+  
+  /* Muted grays */
+  --muted: oklch(0.18 0 0);
+  --muted-foreground: oklch(0.52 0 0);
+  
+  /* Electric blue accent - Skillkit style */
+  --accent: oklch(0.62 0.24 225);
+  --accent-foreground: oklch(0.96 0 0);
+  
+  --destructive: oklch(0.58 0.24 28);
+  --destructive-foreground: oklch(0.96 0 0);
+  
+  /* Dark borders */
+  --border: oklch(0.18 0 0);
+  --input: oklch(0.16 0 0);
+  --ring: oklch(0.62 0.24 225);
+  
+  /* Sharp modern corners */
+  --radius: 0.5rem;
+  
+  /* Sidebar */
+  --sidebar: oklch(0.09 0 0);
+  --sidebar-foreground: oklch(0.96 0 0);
+  --sidebar-primary: oklch(0.62 0.24 225);
+  --sidebar-primary-foreground: oklch(0.96 0 0);
+  --sidebar-accent: oklch(0.14 0 0);
+  --sidebar-accent-foreground: oklch(0.96 0 0);
+  --sidebar-border: oklch(0.18 0 0);
+  --sidebar-ring: oklch(0.62 0.24 225);
 }
 
 @theme inline {
-  /* Updated font-sans and font-mono to use IBM Plex */
-  --font-sans: var(--font-ibm-plex-sans), sans-serif;
-  --font-mono: var(--font-ibm-plex-mono), monospace;
-  --font-display: "Bebas Neue", "Bebas Neue Fallback", sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -59,9 +76,9 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
   --radius-xl: calc(var(--radius) + 4px);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
@@ -75,44 +92,57 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   html {
     overflow-x: hidden;
     max-width: 100vw;
-    scroll-behavior: smooth;
-    /* Apply scrollbar styles to html element */
     scrollbar-width: thin;
-    scrollbar-color: oklch(0.30 0.02 260) oklch(0.09 0.01 260);
+    scrollbar-color: oklch(0.28 0 0) oklch(0.08 0 0);
   }
   body {
     @apply bg-background text-foreground;
     overflow-x: hidden;
     max-width: 100vw;
-    scrollbar-width: thin;
-    scrollbar-color: oklch(0.30 0.02 260) oklch(0.09 0.01 260);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  /* Webkit scrollbar styling for html and body */
   html::-webkit-scrollbar,
   body::-webkit-scrollbar {
-    width: 10px;
+    width: 12px;
   }
   html::-webkit-scrollbar-track,
   body::-webkit-scrollbar-track {
-    background: oklch(0.09 0.01 260);
+    background: oklch(0.08 0 0);
   }
   html::-webkit-scrollbar-thumb,
   body::-webkit-scrollbar-thumb {
-    background: oklch(0.30 0.02 260);
-    border-radius: 5px;
+    background: oklch(0.28 0 0);
+    border-radius: 6px;
   }
   html::-webkit-scrollbar-thumb:hover,
   body::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.40 0.03 260);
+    background: oklch(0.35 0 0);
   }
 }
 
-/* Custom noise texture overlay */
+::selection {
+  background: oklch(0.62 0.24 225 / 0.25);
+  color: oklch(0.98 0 0);
+}
+
+:focus-visible {
+  outline: 2px solid oklch(0.62 0.24 225);
+  outline-offset: 2px;
+}
+
+.grid-bg {
+  background-image: 
+    linear-gradient(to right, oklch(0.11 0 0) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0.11 0 0) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
 .noise-overlay {
   position: fixed;
   top: 0;
@@ -121,40 +151,6 @@
   height: 100%;
   pointer-events: none;
   z-index: 1000;
-  opacity: 0.03;
+  opacity: 0.02;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-}
-
-/* Grid background pattern */
-.grid-bg {
-  background-image: linear-gradient(to right, oklch(0.15 0.015 260 / 0.2) 1px, transparent 1px),
-    linear-gradient(to bottom, oklch(0.15 0.015 260 / 0.2) 1px, transparent 1px);
-  background-size: 100px 100px;
-}
-
-/* Custom selection color */
-::selection {
-  background: oklch(0.70 0.20 35);
-  color: oklch(0.09 0.01 260);
-}
-
-section[id] {
-  scroll-margin-top: 110px;
-}
-
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient-shift 6s ease infinite;
 }
