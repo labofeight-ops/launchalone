@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
+const fetch = require('node-fetch');
+const crypto = require('crypto');
 
 const app = express();
 app.use(cors());
@@ -28,6 +30,138 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false
+  }
+});
+
+// In-memory store for OAuth state -> code_verifier pairs
+const oauthStateStore = new Map();
+
+function randomString(length = 48) {
+  return crypto.randomBytes(length).toString('hex');
+}
+
+function getXConfig() {
+  const clientId = process.env.X_CLIENT_ID;
+  const clientSecret = process.env.X_CLIENT_SECRET;
+  const redirectUri = process.env.X_REDIRECT_URI;
+  return { clientId, clientSecret, redirectUri };
+}
+
+// ---------------------------------------------------------------------------
+// X OAuth2 (Authorization Code with PKCE)
+// ---------------------------------------------------------------------------
+app.get('/api/x/login', (req, res) => {
+  const { clientId, clientSecret, redirectUri } = getXConfig();
+  if (!clientId || !clientSecret || !redirectUri) {
+    return res.redirect('/dashboard?x_error=missing_config');
+  }
+
+  const state = randomString(12);
+  const codeVerifier = randomString(32);
+  const scope = [
+    'tweet.read',
+    'tweet.write',
+    'users.read',
+    'offline.access'
+  ].join(' ');
+
+  oauthStateStore.set(state, codeVerifier);
+
+  const authorizeUrl = new URL('https://twitter.com/i/oauth2/authorize');
+  authorizeUrl.searchParams.set('response_type', 'code');
+  authorizeUrl.searchParams.set('client_id', clientId);
+  authorizeUrl.searchParams.set('redirect_uri', redirectUri);
+  authorizeUrl.searchParams.set('scope', scope);
+  authorizeUrl.searchParams.set('state', state);
+  authorizeUrl.searchParams.set('code_challenge', codeVerifier); // using plain PKCE for simplicity
+  authorizeUrl.searchParams.set('code_challenge_method', 'plain');
+
+  return res.redirect(authorizeUrl.toString());
+});
+
+app.get('/api/x/callback', async (req, res) => {
+  const { code, state, error } = req.query;
+  const { clientId, clientSecret, redirectUri } = getXConfig();
+
+  if (error) {
+    return res.redirect('/dashboard?x_error=oauth_failed');
+  }
+  if (!clientId || !clientSecret || !redirectUri) {
+    return res.redirect('/dashboard?x_error=missing_config');
+  }
+  if (!code || !state || !oauthStateStore.has(state)) {
+    return res.redirect('/dashboard?x_error=invalid_state');
+  }
+
+  const codeVerifier = oauthStateStore.get(state);
+  oauthStateStore.delete(state);
+
+  try {
+    const tokenResponse = await fetch('https://api.twitter.com/2/oauth2/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization:
+          'Basic ' + Buffer.from(`${clientId}:${clientSecret}`).toString('base64'),
+      },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri,
+        code_verifier: codeVerifier,
+      }),
+    });
+
+    if (!tokenResponse.ok) {
+      console.error('X token exchange failed', await tokenResponse.text());
+      return res.redirect('/dashboard?x_error=token_exchange');
+    }
+
+    const tokens = await tokenResponse.json();
+    const accessToken = tokens.access_token;
+    const refreshToken = tokens.refresh_token;
+    const expiresIn = tokens.expires_in || 3600;
+
+    // Fetch user handle to show in UI
+    let handle = '';
+    try {
+      const meResp = await fetch('https://api.twitter.com/2/users/me', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (meResp.ok) {
+        const me = await meResp.json();
+        handle = me?.data?.username ? `@${me.data.username}` : '';
+      }
+    } catch (err) {
+      console.warn('Unable to fetch X user', err.message);
+    }
+
+    // Set session cookies so subsequent API calls can use the token (single-tenant for now)
+    res.cookie('x_access_token', accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: expiresIn * 1000
+    });
+    if (refreshToken) {
+      res.cookie('x_refresh_token', refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+      });
+    }
+
+    // TODO: Persist tokens to Supabase for multi-user; current flow is single-tenant.
+
+    const params = new URLSearchParams({
+      x_connected: '1',
+      handle: handle || '',
+    });
+    return res.redirect(`/dashboard?${params.toString()}#x-login`);
+  } catch (err) {
+    console.error('X OAuth callback error', err);
+    return res.redirect('/dashboard?x_error=oauth_failed');
   }
 });
 
@@ -896,4 +1030,3 @@ if (require.main === module) {
 }
 
 module.exports = app;
-

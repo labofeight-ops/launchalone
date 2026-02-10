@@ -1,6 +1,7 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { Suspense, useEffect, useMemo, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { DashboardStats } from "@/components/dashboard-stats"
 
@@ -286,7 +287,7 @@ function shorten(text: string, max = 80) {
   return `${text.slice(0, max).trim()}...`
 }
 
-export default function DashboardPage() {
+function DashboardPageInner() {
   const [range, setRange] = useState<RangeKey>("30D")
   const [topic, setTopic] = useState("")
   const [brandMode, setBrandMode] = useState(brandModes[0])
@@ -305,6 +306,7 @@ export default function DashboardPage() {
   const [scheduleIndex, setScheduleIndex] = useState(0)
   const [replyOps, setReplyOps] = useState<ReplyOpportunity[]>(defaultReplyOps)
   const [activity, setActivity] = useState<ActivityItem[]>(defaultActivity)
+  const searchParams = useSearchParams()
 
   const data = analyticsByRange[range]
 
@@ -316,6 +318,32 @@ export default function DashboardPage() {
   }, [range])
 
   const currentDate = useMemo(() => formatDate(new Date()), [])
+
+  // Reflect OAuth redirect results in UI
+  useEffect(() => {
+    if (!searchParams) return
+    const error = searchParams.get("x_error")
+    const connected = searchParams.get("x_connected") === "1"
+    const handle = searchParams.get("handle") || ""
+
+    if (error) {
+      setXConnected(false)
+      setStatusNote(
+        error === "missing_config"
+          ? "X login is not configured. Add X_CLIENT_ID / X_CLIENT_SECRET / X_REDIRECT_URI."
+          : "X login failed. Please try again."
+      )
+      return
+    }
+
+    if (connected) {
+      setXConnected(true)
+      if (handle) {
+        setXHandle(handle.startsWith("@") ? handle : `@${handle}`)
+      }
+      setStatusNote("X connected. You can post and schedule.")
+    }
+  }, [searchParams])
 
   function buildDraft() {
     const list = draftTemplates[contentType] || draftTemplates["Single Post"]
@@ -373,18 +401,6 @@ export default function DashboardPage() {
       ...prev,
     ])
     setStatusNote("Post sent. Watch the first 45 minutes.")
-  }
-
-  function handleXConnect() {
-    if (!xHandle.trim().startsWith("@")) {
-      setXHandle((prev) => (prev.startsWith("@") ? prev : `@${prev}`))
-    }
-    setXConnected(true)
-    setActivity((prev) => [
-      { title: "X connected", time: "Just now", stats: xHandle.trim() || "@launchalone" },
-      ...prev,
-    ])
-    setStatusNote("X connected. You can post and schedule.")
   }
 
   function handleXDisconnect() {
@@ -483,12 +499,12 @@ export default function DashboardPage() {
                   />
                 </div>
                 <div className="flex gap-3">
-                  <button
-                    onClick={handleXConnect}
-                    className="flex-1 border border-accent bg-accent px-4 py-2 font-mono text-xs uppercase tracking-widest text-accent-foreground hover:bg-accent/90 transition-colors"
+                  <a
+                    href="/api/x/login"
+                    className="flex-1 text-center border border-accent bg-accent px-4 py-2 font-mono text-xs uppercase tracking-widest text-accent-foreground hover:bg-accent/90 transition-colors"
                   >
                     Sign In With X
-                  </button>
+                  </a>
                   <button
                     onClick={handleXDisconnect}
                     className="flex-1 border border-border px-4 py-2 font-mono text-xs uppercase tracking-widest text-foreground hover:border-accent hover:text-accent transition-colors"
@@ -934,5 +950,17 @@ export default function DashboardPage() {
         </div>
       </main>
     </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="p-6 font-mono text-sm text-muted-foreground">Loading dashboard...</div>
+      }
+    >
+      <DashboardPageInner />
+    </Suspense>
   )
 }

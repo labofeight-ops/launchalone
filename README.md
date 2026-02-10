@@ -29,6 +29,18 @@ Visit: http://localhost:3000
    - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
    - **anon/public key** → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
+## 🔐 X (Twitter) Login Setup
+
+Add these variables (Railway → Variables or `.env`):
+
+```
+X_CLIENT_ID=your-x-app-client-id
+X_CLIENT_SECRET=your-x-app-client-secret
+X_REDIRECT_URI=https://your-domain.com/api/x/callback
+```
+
+Scopes used: `tweet.read tweet.write users.read offline.access`. The dashboard button “Sign In With X” now runs the OAuth flow via `/api/x/login` and returns to `/dashboard#x-login` with status.
+
 ## 🚂 Deploy to Railway (Fix Crashed Deployment)
 
 ### Method 1: Railway CLI
