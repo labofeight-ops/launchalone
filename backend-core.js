@@ -47,6 +47,129 @@ function getXConfig() {
   return { clientId, clientSecret, redirectUri };
 }
 
+async function getOrCreateUser(handle) {
+  if (!handle) return null;
+  const { data: existing } = await supabase
+    .from('users')
+    .select('*')
+    .eq('x_handle', handle)
+    .limit(1)
+    .maybeSingle();
+
+  if (existing) return existing;
+
+  const { data, error } = await supabase
+    .from('users')
+    .insert({
+      x_handle: handle,
+      niche: 'general',
+      target_followers: 10000,
+      content_topics: ['growth']
+    })
+    .select()
+    .maybeSingle();
+
+  if (error) {
+    console.error('Failed to create user for handle', handle, error.message);
+    return null;
+  }
+  return data;
+}
+
+async function upsertXToken({ userId, handle, xUserId, accessToken, refreshToken, expiresIn }) {
+  const expiresAt = expiresIn ? new Date(Date.now() + expiresIn * 1000).toISOString() : null;
+  const { error } = await supabase.from('x_tokens').upsert({
+    user_id: userId,
+    handle,
+    x_user_id: xUserId,
+    access_token: accessToken,
+    refresh_token: refreshToken,
+    expires_at: expiresAt,
+    updated_at: new Date().toISOString()
+  });
+  if (error) {
+    console.error('Failed to upsert x_tokens', error.message);
+  }
+}
+
+async function getStoredToken(userId) {
+  const { data, error } = await supabase
+    .from('x_tokens')
+    .select('*')
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false })
+    .limit(1);
+  if (error) {
+    console.error('getStoredToken error', error.message);
+    return null;
+  }
+  return data && data[0];
+}
+
+async function refreshAccessToken(tokenRow) {
+  const { clientId, clientSecret } = getXConfig();
+  if (!clientId || !clientSecret || !tokenRow?.refresh_token) return null;
+
+  const body = new URLSearchParams({
+    grant_type: 'refresh_token',
+    refresh_token: tokenRow.refresh_token
+  });
+
+  const resp = await fetch('https://api.twitter.com/2/oauth2/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: 'Basic ' + Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
+    },
+    body
+  });
+  if (!resp.ok) {
+    console.error('Refresh token failed', await resp.text());
+    return null;
+  }
+  const json = await resp.json();
+  await upsertXToken({
+    userId: tokenRow.user_id,
+    handle: tokenRow.handle,
+    xUserId: tokenRow.x_user_id,
+    accessToken: json.access_token,
+    refreshToken: json.refresh_token || tokenRow.refresh_token,
+    expiresIn: json.expires_in
+  });
+  return json.access_token;
+}
+
+async function getValidAccessToken(userId) {
+  const tokenRow = await getStoredToken(userId);
+  if (!tokenRow) return null;
+  if (tokenRow.expires_at && new Date(tokenRow.expires_at) > new Date(Date.now() + 60 * 1000)) {
+    return tokenRow.access_token;
+  }
+  // try refresh
+  return await refreshAccessToken(tokenRow);
+}
+
+async function publishToX({ userId, content }) {
+  const accessToken = await getValidAccessToken(userId);
+  if (!accessToken) {
+    throw new Error('No valid X token; reconnect X.');
+  }
+  const resp = await fetch('https://api.twitter.com/2/tweets', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ text: content })
+  });
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`X publish failed: ${resp.status} ${text}`);
+  }
+  const json = await resp.json();
+  return json;
+}
+
 // ---------------------------------------------------------------------------
 // X OAuth2 (Authorization Code with PKCE)
 // ---------------------------------------------------------------------------
@@ -124,6 +247,7 @@ app.get('/api/x/callback', async (req, res) => {
 
     // Fetch user handle to show in UI
     let handle = '';
+    let xUserId = '';
     try {
       const meResp = await fetch('https://api.twitter.com/2/users/me', {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -131,24 +255,24 @@ app.get('/api/x/callback', async (req, res) => {
       if (meResp.ok) {
         const me = await meResp.json();
         handle = me?.data?.username ? `@${me.data.username}` : '';
+        xUserId = me?.data?.id || '';
       }
     } catch (err) {
       console.warn('Unable to fetch X user', err.message);
     }
 
-    // Set session cookies so subsequent API calls can use the token (single-tenant for now)
-    res.cookie('x_access_token', accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      maxAge: expiresIn * 1000
-    });
-    if (refreshToken) {
-      res.cookie('x_refresh_token', refreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'lax',
-        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    // Ensure user record exists
+    const user = await getOrCreateUser(handle || '@launchalone');
+    const userId = user?.id;
+
+    if (userId) {
+      await upsertXToken({
+        userId,
+        handle,
+        xUserId,
+        accessToken,
+        refreshToken,
+        expiresIn
       });
     }
 
@@ -950,21 +1074,50 @@ app.get('/api/metrics', async (req, res) => {
 // POST TO X (requires X API credentials)
 app.post('/api/post/publish', async (req, res) => {
   try {
-    const { userId, contentId } = req.body;
-    
-    // This would integrate with X API
-    // For now, just update status
-    await supabase
-      .from('generated_content')
-      .update({ 
-        status: 'published',
-        published_at: new Date().toISOString()
-      })
-      .eq('id', contentId);
+    const { userId: bodyUserId, contentId, content } = req.body;
+    let userId = bodyUserId;
+
+    // If userId not provided, try to infer from content owner
+    if (!userId && contentId) {
+      const { data: contentRow } = await supabase
+        .from('generated_content')
+        .select('user_id, content')
+        .eq('id', contentId)
+        .maybeSingle();
+      userId = contentRow?.user_id;
+    }
+
+    const textToPublish = content || (await (async () => {
+      const { data } = await supabase
+        .from('generated_content')
+        .select('content')
+        .eq('id', contentId)
+        .maybeSingle();
+      return data?.content;
+    })());
+
+    if (!userId || !textToPublish) {
+      return res.status(400).json({ error: 'Missing userId or content to publish' });
+    }
+
+    // Publish to X
+    const result = await publishToX({ userId, content: textToPublish });
+
+    // Update content status if applicable
+    if (contentId) {
+      await supabase
+        .from('generated_content')
+        .update({ 
+          status: 'published',
+          published_at: new Date().toISOString()
+        })
+        .eq('id', contentId);
+    }
     
     res.json({
       success: true,
-      message: 'Post published. First 45 Minute Stack activated.',
+      message: 'Post published to X.',
+      tweet: result?.data || null,
       nextActions: FIRST_45_STACK.signals.filter(s => s.minute > 0)
     });
     
@@ -1009,6 +1162,235 @@ app.get('/api/account/health', async (req, res) => {
   } catch (error) {
     console.error('Health check error:', error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+// ------------------------------------------------------------
+// Queue slots (slot-based scheduler)
+// ------------------------------------------------------------
+const DEFAULT_SLOT_TIMES = ['09:00', '12:00', '17:00']; // local time slots
+
+async function getDefaultUserId() {
+  const { data } = await supabase.from('users').select('id').limit(1);
+  return data && data[0] ? data[0].id : null;
+}
+
+function combineDateTime(dateObj, timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  const d = new Date(dateObj);
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+
+async function nextAvailableSlot(userId) {
+  const now = new Date();
+  for (let dayOffset = 0; dayOffset < 3; dayOffset++) {
+    const day = new Date(now);
+    day.setDate(day.getDate() + dayOffset);
+    const start = new Date(day);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(day);
+    end.setHours(23, 59, 59, 999);
+
+    const { data: existing } = await supabase
+      .from('queue_slots')
+      .select('scheduled_at')
+      .eq('user_id', userId)
+      .gte('scheduled_at', start.toISOString())
+      .lte('scheduled_at', end.toISOString());
+
+    const takenTimes = new Set(
+      (existing || []).map((row) => {
+        const dt = new Date(row.scheduled_at);
+        return `${dt.getHours().toString().padStart(2, '0')}:${dt
+          .getMinutes()
+          .toString()
+          .padStart(2, '0')}`;
+      })
+    );
+
+    for (const slot of DEFAULT_SLOT_TIMES) {
+      if (!takenTimes.has(slot)) {
+        const dt = combineDateTime(day, slot);
+        if (dt > now) return dt;
+      }
+    }
+  }
+  // fallback: 3 days later first slot
+  const fallback = new Date();
+  fallback.setDate(fallback.getDate() + 3);
+  return combineDateTime(fallback, DEFAULT_SLOT_TIMES[0]);
+}
+
+app.get('/api/queue/slots', async (req, res) => {
+  try {
+    let { user_id } = req.query;
+    if (!user_id) user_id = await getDefaultUserId();
+    if (!user_id) return res.status(400).json({ error: 'No user_id found' });
+
+    const { data, error } = await supabase
+      .from('queue_slots')
+      .select('*')
+      .eq('user_id', user_id)
+      .order('scheduled_at', { ascending: true })
+      .limit(100);
+
+    if (error) throw error;
+    res.json({ success: true, slots: data || [] });
+  } catch (err) {
+    console.error('queue/slots get error', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/queue/slots', async (req, res) => {
+  try {
+    let { user_id, content, scheduled_at, source } = req.body;
+    if (!user_id) user_id = await getDefaultUserId();
+    if (!user_id) return res.status(400).json({ error: 'No user_id found' });
+    if (!content) return res.status(400).json({ error: 'content is required' });
+
+    let slotTime = scheduled_at ? new Date(scheduled_at) : await nextAvailableSlot(user_id);
+    const { data, error } = await supabase
+      .from('queue_slots')
+      .insert({
+        user_id,
+        content,
+        scheduled_at: slotTime.toISOString(),
+        source: source || 'writer',
+        status: 'scheduled'
+      })
+      .select()
+      .maybeSingle();
+    if (error) throw error;
+    res.json({ success: true, slot: data });
+  } catch (err) {
+    console.error('queue/slots post error', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/queue/run', async (req, res) => {
+  try {
+    let { user_id } = req.body;
+    if (!user_id) user_id = await getDefaultUserId();
+    if (!user_id) return res.status(400).json({ error: 'No user_id found' });
+
+    const now = new Date().toISOString();
+    const { data: dueSlots, error } = await supabase
+      .from('queue_slots')
+      .select('*')
+      .eq('user_id', user_id)
+      .eq('status', 'scheduled')
+      .lte('scheduled_at', now)
+      .order('scheduled_at', { ascending: true })
+      .limit(5);
+    if (error) throw error;
+
+    const results = [];
+    for (const slot of dueSlots || []) {
+      try {
+        await supabase
+          .from('queue_slots')
+          .update({ status: 'posting', updated_at: new Date().toISOString() })
+          .eq('id', slot.id);
+
+        const tweet = await publishToX({ userId: slot.user_id, content: slot.content });
+
+        await supabase
+          .from('queue_slots')
+          .update({
+            status: 'posted',
+            posted_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', slot.id);
+
+        results.push({ id: slot.id, status: 'posted', tweet: tweet?.data || null });
+      } catch (err) {
+        await supabase
+          .from('queue_slots')
+          .update({
+            status: 'failed',
+            failure_reason: err.message,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', slot.id);
+        results.push({ id: slot.id, status: 'failed', error: err.message });
+      }
+    }
+    res.json({ success: true, results });
+  } catch (err) {
+    console.error('queue/run error', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ------------------------------------------------------------
+// Engage - Mentions inbox
+// ------------------------------------------------------------
+app.get('/api/engage/mentions', async (req, res) => {
+  try {
+    let { user_id, max_results } = req.query;
+    if (!user_id) user_id = await getDefaultUserId();
+    if (!user_id) return res.status(400).json({ error: 'No user_id found' });
+
+    const tokenRow = await getStoredToken(user_id);
+    if (!tokenRow) return res.status(400).json({ error: 'Connect X first.' });
+
+    let accessToken = await getValidAccessToken(user_id);
+    if (!accessToken) return res.status(400).json({ error: 'X token expired; reconnect.' });
+
+    let xUserId = tokenRow.x_user_id;
+    if (!xUserId) {
+      const meResp = await fetch('https://api.twitter.com/2/users/me', {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      if (meResp.ok) {
+        const me = await meResp.json();
+        xUserId = me?.data?.id;
+        await upsertXToken({
+          userId: user_id,
+          handle: tokenRow.handle,
+          xUserId,
+          accessToken,
+          refreshToken: tokenRow.refresh_token,
+          expiresIn: 3600
+        });
+      }
+    }
+
+    const params = new URLSearchParams();
+    params.set('max_results', Math.min(Number(max_results) || 20, 50));
+    params.set('tweet.fields', 'created_at,public_metrics');
+    params.set('expansions', 'author_id');
+    params.set('user.fields', 'username,name,profile_image_url');
+
+    const mentionsResp = await fetch(`https://api.twitter.com/2/users/${xUserId}/mentions?${params.toString()}`, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (!mentionsResp.ok) {
+      const text = await mentionsResp.text();
+      throw new Error(`Mentions fetch failed: ${mentionsResp.status} ${text}`);
+    }
+    const json = await mentionsResp.json();
+    res.json({ success: true, ...json });
+  } catch (err) {
+    console.error('engage/mentions error', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Simple status endpoint for UI
+app.get('/api/x/status', async (req, res) => {
+  try {
+    let { user_id } = req.query;
+    if (!user_id) user_id = await getDefaultUserId();
+    if (!user_id) return res.json({ connected: false });
+    const token = await getStoredToken(user_id);
+    res.json({ connected: !!token, handle: token?.handle || null });
+  } catch (err) {
+    res.json({ connected: false, error: err.message });
   }
 });
 

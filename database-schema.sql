@@ -69,6 +69,35 @@ CREATE TABLE scheduled_posts (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- X OAuth tokens (per user)
+CREATE TABLE IF NOT EXISTS x_tokens (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  x_user_id TEXT,
+  handle TEXT,
+  access_token TEXT NOT NULL,
+  refresh_token TEXT,
+  expires_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS x_tokens_user_idx ON x_tokens(user_id);
+
+-- Slot-based posting queue
+CREATE TABLE IF NOT EXISTS queue_slots (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  scheduled_at TIMESTAMPTZ NOT NULL,
+  status TEXT DEFAULT 'scheduled', -- scheduled | posting | posted | failed
+  failure_reason TEXT,
+  posted_at TIMESTAMPTZ,
+  source TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS queue_slots_user_time_idx ON queue_slots(user_id, scheduled_at);
+
 -- Competitor tracking
 CREATE TABLE competitors (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

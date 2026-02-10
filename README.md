@@ -41,6 +41,18 @@ X_REDIRECT_URI=https://your-domain.com/api/x/callback
 
 Scopes used: `tweet.read tweet.write users.read offline.access`. The dashboard button “Sign In With X” now runs the OAuth flow via `/api/x/login` and returns to `/dashboard#x-login` with status.
 
+### Queue & Mentions (new APIs)
+
+- Slot-based queue:  
+  - `POST /api/queue/slots` { content, scheduled_at?, source? } → schedules into the next open slot (09:00 / 12:00 / 17:00 local if no time provided).  
+  - `GET /api/queue/slots` → list upcoming slots.  
+  - `POST /api/queue/run` → publishes due slots (for cron/worker).
+- Publish: `POST /api/post/publish` { userId?, contentId?, content? } → posts to X using stored tokens.
+- Mentions inbox: `GET /api/engage/mentions` → pulls recent mentions from X (needs connected account).
+- Status: `GET /api/x/status` → `{ connected, handle }`.
+
+Supabase tables needed (added to `database-schema.sql`): `x_tokens`, `queue_slots`. Run the SQL in Supabase SQL editor or via migration before deploy.
+
 ## 🚂 Deploy to Railway (Fix Crashed Deployment)
 
 ### Method 1: Railway CLI
